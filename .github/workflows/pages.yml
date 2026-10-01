@@ -1,0 +1,48 @@
+name: スライドをGitHub Pagesに公開
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "slides/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 公開中のデプロイは中断せず、後続の実行だけを待たせる
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/configure-pages@v5
+
+      # コミット済みのMarp出力をそのまま公開する (slides.html をトップページにする)
+      - name: 公開するファイルをまとめる
+        run: |
+          mkdir -p _site
+          cp slides/slides.html _site/index.html
+          cp -R slides/images _site/images
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

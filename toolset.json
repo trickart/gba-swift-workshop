@@ -1,0 +1,22 @@
+{
+    "schemaVersion": "1.0",
+    "swiftCompiler": {
+        "extraCLIOptions": [
+            "-enable-experimental-feature", "Embedded",
+            "-Xfrontend", "-disable-stack-protector",
+            "-use-ld=lld",
+            "-nostartfiles",
+            "-Xlinker", "-nostdlib",
+            "-Xclang-linker", "-nostdlib",
+            "-Xlinker", "-static",
+            "-wmo",
+            "-O"
+        ]
+    },
+    "linker": {
+        "extraCLIOptions": [
+            "-T", "linker/gba.ld",
+            "--gc-sections"
+        ]
+    }
+}
