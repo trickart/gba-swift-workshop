@@ -17,6 +17,8 @@ swiftly install 6.4.2
 swiftly use 6.4.2
 ```
 
+ツールチェーンを用意できない場合は、下の「GitHub Codespaces で試す」の方法でブラウザだけでも進められる。
+
 - 動作確認用エミュレータ (mGBA など)
   - ブラウザで実行できる[mGBA web](https://trickart.github.io/mgba-web/)を用意してます
 - 実機確認用
@@ -37,6 +39,24 @@ make clean
 
 コンパイルにも `llvm-objcopy` などのツールにも、swiftly で選択中のツールチェーンを使う
 (`swiftly use` で切り替える)。
+swiftly がない環境では、PATH 上の `swift` と同じ場所にあるツールを使う。
+
+## GitHub Codespaces で試す
+
+手元に Swift ツールチェーンがなくても、GitHub アカウントとブラウザがあればビルドできる。
+
+1. GitHub のリポジトリページで **Code → Codespaces → Create codespace on main** を選ぶ
+   (初回は環境の作成に数分かかる。作成時に一度 `make build` が走る)
+2. ブラウザで開いた VS Code でコードを編集し、ターミナルで `make build` を実行する
+3. エクスプローラで `build/game.mb.gba` を右クリック → **Download** で手元に保存する
+4. [mGBA web](https://trickart.github.io/mgba-web/) にドロップして動かす。
+   実機へは [gba-multiboot-web](https://github.com/trickart/gba-multiboot-web) から転送する
+
+Codespaces からは手元の mGBA や USB 機器を使えないので、`make run` は mGBA web の案内を
+表示するだけで、`make send` は使えない。
+
+同じ設定 (`.devcontainer/`) は、Docker と VS Code の Dev Containers 拡張機能があれば
+手元でも使える (**Dev Containers: Reopen in Container**)。
 
 ## ゲームのコード
 

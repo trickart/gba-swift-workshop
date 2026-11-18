@@ -5,8 +5,14 @@ ELF := .build/$(TRIPLE)/debug/Application
 ROM := build/game.mb.gba
 
 # Swiftツールチェーン内のLLVMツール (clang / ld.lld / llvm-objcopy) を使う。
-# ツールチェーンは swiftly で選択中のもの (swiftly use で切り替える)
-TCBIN := $(shell swiftly use --print-location 2>/dev/null)/usr/bin
+# ツールチェーンは swiftly で選択中のもの (swiftly use で切り替える)。
+# swiftly がない環境 (公式Dockerイメージ / Codespaces) では PATH 上の swift と同じ場所を使う
+TOOLCHAIN := $(shell swiftly use --print-location 2>/dev/null)
+ifneq ($(TOOLCHAIN),)
+TCBIN := $(TOOLCHAIN)/usr/bin
+else
+TCBIN := $(patsubst %/,%,$(dir $(shell command -v swift)))
+endif
 export PATH := $(TCBIN):$(PATH)
 
 # ヘッダのロゴ領域とチェックサムの書き込みは tools/gbafix.swift で行う
@@ -30,8 +36,14 @@ build:
 	"$(TCBIN)/llvm-objcopy" -O binary $(ELF) $(ROM)
 	$(GBAFIX) $(ROM)
 
+# mGBA の起動は macOS のみ。それ以外 (Codespaces など) ではブラウザの mGBA web を案内する
 run: build
+ifeq ($(shell uname -s),Darwin)
 	open -a mGBA $(ROM)
+else
+	@echo "$(ROM) をダウンロードして mGBA web にドロップしてください:"
+	@echo "  https://trickart.github.io/mgba-web/"
+endif
 
 send: build
 	$(MULTIBOOT) $(ROM) $(if $(PORT),--port $(PORT))
